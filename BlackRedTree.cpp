@@ -23,18 +23,89 @@ struct BlackRedNode {
     T value;
 
     NodePtr getBrother() {
-        return parent == nullptr ? nullptr :
+        return parent.lock() == nullptr ? nullptr :
                isLeftChild ? parent.lock()->rightChild :
                parent.lock()->leftChild;
     }
 };
 
 template<typename T>
+void rotate(typename std::shared_ptr<BlackRedNode<T>> pt, bool left) {
+    auto newInPlace = left ? pt->rightChild : pt->leftChild;
+    if (newInPlace == nullptr)
+        throw std::exception();
+    auto parent = pt->parent.lock();
+    if (parent != nullptr) {
+        if (pt->isLeftChild)
+            parent->leftChild = newInPlace;
+        else
+            parent->rightChild = newInPlace;
+    }
+    newInPlace->parent = parent;
+    pt->parent = newInPlace;
+    if (left) {
+        pt->rightChild = newInPlace->leftChild;
+        if (pt->rightChild != nullptr)
+            pt->rightChild->parent = pt;
+        newInPlace->leftChild = pt;
+    } else {
+        pt->leftChild = newInPlace->rightChild;
+        if (pt->leftChild != nullptr)
+            pt->leftChild->parent = pt;
+        newInPlace->rightChild = pt;
+    }
+}
+
+template<typename T>
 class BlackRedTree : public AbstractTree<T> {
     std::shared_ptr<BlackRedNode<T>> head = nullptr;
 
-    void FixNode(std::weak_ptr<BlackRedNode<T>> node) {
-        // TODO
+    void fixAdd(std::weak_ptr<BlackRedNode<T>> node) {
+        // Метод вызывается для красного node
+        auto pt = node.lock();
+        auto parent = pt->parent.lock();
+        if (parent == nullptr) {
+            // Случай 1
+            pt->isBlack = true;
+            return;
+        }
+        if (parent->isBlack) {
+            // Случай 2
+            return;
+        }
+        if (not parent->isBlack and parent->getBrother() != nullptr and not parent->getBrother()->isBlack) {
+            // Случай 3
+            parent->isBlack = true;
+            parent->getBrother()->isBlack = true;
+            parent->parent.lock()->isBlack = false;
+            fixAdd(parent->parent);
+            return;
+        }
+        auto grandpa = parent->parent.lock();
+        if (parent->isLeftChild) { // В зависимости от расположенности родителя...
+            if (not pt->isLeftChild) {
+                // Случай 4
+                rotate(parent, true);
+                std::swap(pt, parent);
+            }
+            // Случай 5
+            rotate(grandpa, false);
+            grandpa->isBlack = false;
+            parent->isBlack = true;
+        } else {
+            if (pt->isLeftChild) {
+                // Случай 4
+                rotate(parent, false);
+                std::swap(pt, parent);
+            }
+            // Случай 5
+            rotate(grandpa, true);
+            grandpa->isBlack = false;
+            parent->isBlack = true;
+        }
+        // На случай если голова сместилась
+        if (head == grandpa)
+            head = grandpa->parent.lock();
     }
 
 public:
@@ -73,7 +144,7 @@ public:
             newPt->isLeftChild = true;
             pt->leftChild = newPt;
         }
-        FixNode(newPt);
+        fixAdd(newPt);
     }
 
     bool check(T value) {
@@ -92,4 +163,5 @@ public:
     void remove(T value) {
         // TODO
     }
+
 };
