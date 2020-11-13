@@ -20,16 +20,14 @@ class TestingSystem
     public:
     Tree my_tree;
     //не понимаю, когда объявлять, когда опредять конструктор, надо ли туда что-то писать и что;
-    TestingSystem(Tree my_tree)
+    explicit TestingSystem(Tree my_tree)
     {
         this -> my_tree = my_tree;
     }
     ~TestingSystem()
-    {
+    = default;
 
-    }
-
-    double get_time()
+    static double get_time()
     {
         return std::chrono::duration_cast<std::chrono::microseconds>
                        (std::chrono::steady_clock::now().time_since_epoch()).count()/1e6;
