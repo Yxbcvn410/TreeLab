@@ -11,25 +11,51 @@
 #include "BlackRedTree.cpp"
 
 typedef int T;
-typedef std::unique_ptr<AbstractTree<T>> Tree;
+typedef std::shared_ptr<BlackRedTree<T>> Tree;
 
 int main() {
-    Tree tree = std::make_unique<BlackRedTree<T>>();
-    int m = 1000;
+    Tree tree(new BlackRedTree<T>());
+    int m = 2000000;
+    double f = 0.5;
     for (int i = 0; i < m; ++i)
         tree->add(i);
     bool flag = true;
     for (int i = 0; i < 2 * m; ++i) {
-        if ((i < 1000) != tree->check(i)) {
+        if ((i < m) != tree->check(i)) {
             flag = false;
-            std::cout << "ERROR: ";
-            if (i < 1000)
-                std::cout << i << " is claimed to be not included, but should" << std::endl;
-            else
+            std::cout << "ERROR on addition test: ";
+            if (tree->check(i))
                 std::cout << i << " is claimed to be included, but should not" << std::endl;
+            else
+                std::cout << i << " is claimed to be not included, but should" << std::endl;
+
+        }
+    }
+    for (int i = m * f; i < m; ++i)
+        tree->remove(i);
+    for (int i = 0; i < 2 * m; ++i) {
+        if ((i < (int) (m * f)) != tree->check(i)) {
+            flag = false;
+            std::cout << "ERROR on deletion test: ";
+            if (tree->check(i))
+                std::cout << i << " is claimed to be included, but should not";
+            else
+                std::cout << i << " is claimed to be not included, but should";
+            std::cout << std::endl;
+        }
+    }
+    for (int i = 0; i < m; ++i)
+        tree->add(i);
+    for (int i = 0; i < 2 * m; ++i) {
+        if ((i < m) != tree->check(i)) {
+            flag = false;
+            std::cout << "ERROR on addition test: ";
+            if (tree->check(i))
+                std::cout << i << " is claimed to be included, but should not" << std::endl;
+            else
+                std::cout << i << " is claimed to be not included, but should" << std::endl;
 
         }
     }
     std::cout << "Test " << (flag ? "passed" : "failed") << std::endl;
-    // TODO(Alsushka-lullo) Здесь добавить тесты.
 };
