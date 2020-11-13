@@ -1,14 +1,8 @@
-//
-// Created by alexander on 07.11.2020.
-//
-
-#include <bits/unique_ptr.h>
 #include <chrono>
 #include "AbstractTree.cpp"
 #include "AVLTree.cpp"
 #include<fstream>
 #include <vector>
-#include <iterator>
 #include <string>
 #include <iostream>
 #include <memory>
@@ -43,11 +37,11 @@ class TestingSystem
 
 using time_t = double;
 
-    void checking_all(std::vector<int> & number_tests)
+    void checking_all(std::vector<int> & number_tests, std::string & final_file)
     {
         for(int k = 0; k < M; k++)
         {
-            std::ofstream ofs_final("final.txt");
+            std::ofstream ofs_final(final_file); //без &?
             time_t start = get_time();
             for(int i = 0; i < number_tests.size(); i++)
             {
@@ -80,10 +74,12 @@ using time_t = double;
 int main() {
    // Tree tree(new AVLTree<int>());
     std::shared_ptr<AbstractTree<T>> tree(new BlackRedTree<T>());
-
+    std::string tree_file, number_file, final_file;
+    std::cout << "Please, enter names of 3 files:1)for creation of the tree; 2)with numbers for tests; 3)for final answers";
+    std::cin >> tree_file >> number_file >> final_file;
 
     int size_of_tree = 0;
-    std::ifstream ifs_tree("tree.txt");
+    std::ifstream ifs_tree(tree_file);
     if (ifs_tree.is_open())
     {
         int a = 0;
@@ -94,11 +90,11 @@ int main() {
         }
     }
     ifs_tree.close();
-    std::ofstream ofs_final("final.txt");
+    std::ofstream ofs_final(final_file);
     std::cout  << "size of tree = " << size_of_tree << std::endl;
     ofs_final.close();
     std::vector<int> numbers_for_test;
-    std::ifstream ifs_test("test.txt");
+    std::ifstream ifs_test(number_file);
     if (ifs_test.is_open())
     {
         int a = 0;
@@ -110,5 +106,5 @@ int main() {
     ifs_test.close();
 
 
-    TestingSystem(tree).checking_all(numbers_for_test);
+    TestingSystem(tree).checking_all(numbers_for_test, final_file);
 }
