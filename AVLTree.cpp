@@ -13,7 +13,7 @@ struct AVLTreeNode {
 
     NodePtr leftChild = nullptr;
     NodePtr rightChild = nullptr;
-    NodePtr parent = nullptr;
+    WeakNodePtr parent;
 
     bool isLeftChild = false;
 
@@ -51,7 +51,7 @@ class AVLTree : public AbstractTree<T> {
     void remove_rec(const T& value, typename std::shared_ptr<AVLTreeNode<T>> node) {
         if (node == nullptr) return;
 
-        auto parent = node->parent;
+        auto parent = node->parent.lock();
         if (node->value < value) remove_rec(value, node->rightChild);
         else if (node->value > value) remove_rec(value, node->leftChild);
         //two children
@@ -77,11 +77,11 @@ class AVLTree : public AbstractTree<T> {
         else {
             bool is_left = node->isLeftChild;
             if (node->leftChild != nullptr) {
-                node->leftChild->parent = node->parent;
-                node = std::move(node->leftChild);
+                node->leftChild->parent = node->parent.lock();
+                node = (node->leftChild);
             } else {
-                if (node->rightChild != nullptr) node->rightChild->parent = node->parent;
-                node = std::move(node->rightChild);
+                if (node->rightChild != nullptr) node->rightChild->parent = node->parent.lock();
+                node = (node->rightChild);
             }
             if (parent != nullptr) {
                 if (is_left) {
@@ -122,76 +122,76 @@ class AVLTree : public AbstractTree<T> {
         }
 
         node->height = std::max(height(node->leftChild), height(node->rightChild)) + 1;
-        balance(node->parent);
+        balance(node->parent.lock());
    }
 
     void rotateWithLeftChild(typename std::shared_ptr<AVLTreeNode<T>> node)
     {
-        auto left = std::move(node->leftChild);
+        auto left = (node->leftChild);
 
         if (left->rightChild != nullptr) {
             left->rightChild->parent = node;
             left->rightChild->isLeftChild = true;
         }
-        node->leftChild = std::move(left->rightChild);
+        node->leftChild = (left->rightChild);
 
         node->height = std::max(height(node->leftChild), height(node->rightChild)) + 1;
         left->height = std::max(height(left->leftChild), node->height) + 1;
 
-        if (node->parent != nullptr) {
+        if (node->parent.lock() != nullptr) {
             if (node->isLeftChild) {
-                node->parent->leftChild = left;
+                node->parent.lock()->leftChild = left;
             } else {
-                node->parent->rightChild = left;
+                node->parent.lock()->rightChild = left;
             }
         }
 
-        left->parent = node->parent;
+        left->parent = node->parent.lock();
         node->parent = left;
 
         left->isLeftChild = node->isLeftChild;
         node->isLeftChild = false;
 
-        left->rightChild = std::move(node);
-        node = std::move(left);
-        if (root->parent != nullptr) {
-            root = root->parent;
+        left->rightChild = (node);
+        node = (left);
+        while (root->parent.lock() != nullptr) {
+            root = root->parent.lock();
         }
     }
 
     void rotateWithRightChild(typename std::shared_ptr<AVLTreeNode<T>> node)
     {
-        auto right = std::move(node->rightChild);
+        auto right = (node->rightChild);
 
         if (right->leftChild != nullptr) {
             right->leftChild->parent = node;
             right->leftChild->isLeftChild = false;
         }
-        node->rightChild = std::move(right->leftChild);
+        node->rightChild = (right->leftChild);
 
         node->height = std::max(height(node->leftChild), height(node->rightChild)) + 1;
         right->height = std::max(height(right->rightChild), node->height) + 1;
 
-        if (node->parent != nullptr) {
+        if (node->parent.lock() != nullptr) {
             if (node->isLeftChild) {
-                node->parent->leftChild = right;
+                node->parent.lock()->leftChild = right;
             } else {
-                node->parent->rightChild = right;
+                node->parent.lock()->rightChild = right;
             }
         }
 
 
-        right->parent = node->parent;
+        right->parent = node->parent.lock();
         node->parent = right;
 
         right->isLeftChild = node->isLeftChild;
         node->isLeftChild = true;
 
-        right->leftChild = std::move(node);
-        node = std::move(right);
+        right->leftChild = (node);
+        node = (right);
 
-        if (root->parent != nullptr) {
-            root = root->parent;
+        while (root->parent.lock() != nullptr) {
+            root = root->parent.lock();
         }
     }
 
