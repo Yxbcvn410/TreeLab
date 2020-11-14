@@ -19,37 +19,44 @@ public:
     Tree my_tree;
 
     //не понимаю, когда объявлять, когда опредять конструктор, надо ли туда что-то писать и что;
-    explicit TestingSystem(Tree my_tree) {
+    explicit TestingSystem(Tree my_tree)
+    {
         this->my_tree = my_tree;
     }
 
     ~TestingSystem()
     = default;
 
-    static double get_time() {
+    static double get_time()
+    {
         return std::chrono::duration_cast<std::chrono::microseconds>
-                (std::chrono::steady_clock::now().time_since_epoch()).count(); // Будем использовать наносекунды, окда?да
+                (std::chrono::steady_clock::now().time_since_epoch()).count(); // use nanoseconds
     }
 
-    void checking_all(std::vector<int> &number_tests, std::string &final_file, int M) {
+    void check_all(std::vector<int> &number_tests, std::string &final_file, int M)
+    {
         std::vector<double> add, check, remove;
-        for (int k = 0; k < M; k++) {
+        for (int k = 0; k < M; k++)
+        {
             double start = get_time();
-            for (int number_test : number_tests) {
+            for (int number_test : number_tests)
+            {
                 my_tree->add(number_test);
             }
             double end = get_time();
             add.push_back((end - start) / number_tests.size());
 
             start = get_time();
-            for (int number_test : number_tests) {
+            for (int number_test : number_tests)
+            {
                 my_tree->check(number_test);
             }
             end = get_time();
             check.push_back((end - start) / number_tests.size());
 
             start = get_time();
-            for (int number_test : number_tests) {
+            for (int number_test : number_tests)
+            {
                 my_tree->remove(number_test);
             }
             end = get_time();
@@ -105,5 +112,5 @@ int main() {
     }
     ifs_test.close();
 
-    TestingSystem(tree).checking_all(numbers_for_test, final_file, m);
+    TestingSystem(tree).check_all(numbers_for_test, final_file, m);
 }
