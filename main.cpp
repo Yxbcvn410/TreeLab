@@ -28,7 +28,7 @@ public:
 
     static double get_time() {
         return std::chrono::duration_cast<std::chrono::microseconds>
-                (std::chrono::steady_clock::now().time_since_epoch()).count(); // Будем использовать наносекунды, окда?
+                (std::chrono::steady_clock::now().time_since_epoch()).count(); // Будем использовать наносекунды, окда?да
     }
 
     void checking_all(std::vector<int> &number_tests, std::string &final_file, int M) {
