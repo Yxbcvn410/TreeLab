@@ -11,14 +11,18 @@
 #include "BlackRedTree.cpp"
 
 typedef int T;
-typedef std::shared_ptr<BlackRedTree<T>> Tree;
+typedef std::shared_ptr<AVLTree<T>> Tree;
 
 int main() {
-    Tree tree(new BlackRedTree<T>());
-    int m = 2000000;
+    Tree tree(new AVLTree<T>());
+    int m = 150000;
     double f = 0.5;
-    for (int i = 0; i < m; ++i)
-        tree->add(i);
+    for (int i = 0; i < m; ++i) {
+          tree->add(i);
+//        std::cout << "here is the tree after addititon " << i << '\n';
+//        tree->print();
+//        std::cout << '\n';
+    }
     bool flag = true;
     for (int i = 0; i < 2 * m; ++i) {
         if ((i < m) != tree->check(i)) {
@@ -31,8 +35,12 @@ int main() {
 
         }
     }
-    for (int i = m * f; i < m; ++i)
+    for (int i = m * f; i < m; ++i) {
         tree->remove(i);
+//        std::cout << "here is the tree after removing " << i << '\n';
+//        tree->print();
+//        std::cout << '\n';
+    }
     for (int i = 0; i < 2 * m; ++i) {
         if ((i < (int) (m * f)) != tree->check(i)) {
             flag = false;
@@ -49,7 +57,7 @@ int main() {
     for (int i = 0; i < 2 * m; ++i) {
         if ((i < m) != tree->check(i)) {
             flag = false;
-            std::cout << "ERROR on addition test: ";
+            std::cout << "ERROR on addition test 2: ";
             if (tree->check(i))
                 std::cout << i << " is claimed to be included, but should not" << std::endl;
             else
