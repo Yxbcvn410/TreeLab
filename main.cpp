@@ -77,9 +77,24 @@ public:
 };
 
 
-int main() {
-    // Tree tree(new AVLTree<int>());
-    std::shared_ptr<AbstractTree<T>> tree(new BlackRedTree<T>());
+int main()
+{
+    //Tree tree(new AVLTree<T>());
+    Tree tree;
+    //std::shared_ptr<AbstractTree<T>> tree;
+    std::string type_of_tree;
+    std::cout << "What type of tree do you want to use? BlackRedTree or AVLTree?";
+    std::cin >> type_of_tree;
+    if(type_of_tree == "BlackRedTree")
+    {
+        tree = Tree(new BlackRedTree<T>());
+        //std::shared_ptr<AbstractTree<T>> Tree(new BlackRedTree<T>());
+    }
+    else if(type_of_tree == "AVLTree")
+    {
+        tree = Tree(new AVLTree<T>());
+        //std::shared_ptr<AbstractTree<T>> tree(new AVLTree<T>());
+    }
     std::string tree_file, number_file, final_file;
     std::cout
             << "tree? tests? answers?" << std::endl;
