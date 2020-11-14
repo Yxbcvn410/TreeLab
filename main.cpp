@@ -12,13 +12,10 @@
 using T = int;
 using Tree = std::shared_ptr<AbstractTree<T>>;
 
-
 class TestingSystem
 {
 public:
     Tree my_tree;
-
-    //не понимаю, когда объявлять, когда опредять конструктор, надо ли туда что-то писать и что;
     explicit TestingSystem(Tree my_tree)
     {
         this->my_tree = my_tree;
@@ -79,21 +76,18 @@ public:
 
 int main()
 {
-    //Tree tree(new AVLTree<T>());
     Tree tree;
-    //std::shared_ptr<AbstractTree<T>> tree;
     std::string type_of_tree;
     std::cout << "What type of tree do you want to use? BlackRedTree or AVLTree?";
     std::cin >> type_of_tree;
     if(type_of_tree == "BlackRedTree")
     {
         tree = Tree(new BlackRedTree<T>());
-        //std::shared_ptr<AbstractTree<T>> Tree(new BlackRedTree<T>());
     }
     else if(type_of_tree == "AVLTree")
     {
         tree = Tree(new AVLTree<T>());
-        //std::shared_ptr<AbstractTree<T>> tree(new AVLTree<T>());
+
     }
     std::string tree_file, number_file, final_file;
     std::cout
